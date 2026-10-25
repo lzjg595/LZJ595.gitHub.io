@@ -97,6 +97,11 @@ input,textarea{font-family:inherit}
 .pbar{background:linear-gradient(90deg,var(--primary),var(--primary-2));height:100%;border-radius:99px;transition:width .25s}
 .pmeta{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:10px}
 .pmeta b{color:var(--primary)}
+.p-stats{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.p-stats .ps{font-size:12px;font-weight:700;border-radius:99px;padding:3px 9px;line-height:1.2;white-space:nowrap}
+.p-stats .ps.ok{background:#E4F4EC;color:#1E8E5A}
+.p-stats .ps.bad{background:#FBEAEA;color:#D64545}
+.p-stats .ps.todo{background:#E7EEF7;color:var(--primary)}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);position:relative}
 .q-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding-right:44px}
 .fav-btn{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:#C3CEDC;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s,color .12s}
@@ -954,12 +959,20 @@ function renderPracticePage(){
 
   const answered = !!P.answered[q.id];
   const sel = P.sel[q.id] || [];
+  const doneCount = Object.keys(P.answered).length;
+  const rightCount = Object.values(P.correct).filter(Boolean).length;
+  const wrongCount = doneCount - rightCount;
+  const remainCount = P.qids.length - doneCount;
   const progress = Math.round((P.idx) / P.qids.length * 100);
   $('#sheetBarText').textContent = '答题卡 ' + Object.keys(P.answered).length + '/' + P.qids.length;
 
   let body = '';
   body += '<div class="pbar-wrap"><div class="pbar" style="width:' + progress + '%"></div></div>';
-  body += '<div class="pmeta"><span><b>' + (P.idx + 1) + '</b> / ' + P.qids.length + '</span>' +
+  body += '<div class="pmeta"><span class="p-stats">' +
+          '<span class="ps ok">对 ' + rightCount + '</span>' +
+          '<span class="ps bad">错 ' + wrongCount + '</span>' +
+          '<span class="ps todo">剩 ' + remainCount + '</span>' +
+          '</span>' +
           '<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">' +
           '<button class="shuffle-btn' + (autoSubmit ? ' on' : '') + '" id="autoBtn" title="开启后：答对自动进入下一题，答错停留5秒；单选/判断点击即判，多选提交后生效">自动提交 ' + (autoSubmit ? '开' : '关') + '</button>' +
           '<button class="shuffle-btn' + (P.shuffled ? ' on' : '') + '" id="shuffleBtn">' + (P.shuffled ? '乱序已开' : '切换乱序') + '</button>' +
