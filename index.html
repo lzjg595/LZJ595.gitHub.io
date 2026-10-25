@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>长沙南车站刷题程序</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2315457C'/%3E%3Cpath d='M32 14l14 6v12c0 11-6 17-14 20-8-3-14-9-14-20V20l14-6z' fill='none' stroke='%23E8A23B' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M24 34h16M24 41h10' stroke='%23fff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FFFFFF'/%3E%3Cg stroke='%23E60012' fill='%23E60012'%3E%3Cpath d='M14 38 A22 22 0 0 1 50 38' fill='none' stroke-width='5'/%3E%3Cpath d='M32 10 L18 36 M32 10 L46 36' fill='none' stroke-width='5' stroke-linecap='round'/%3E%3Crect x='13' y='34' width='38' height='7' rx='2'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#EEF2F7; --surface:#FFFFFF; --ink:#1A2433; --muted:#6B7A90;
@@ -26,8 +26,8 @@ input,textarea{font-family:inherit}
 /* ===== 顶栏 ===== */
 #topbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--primary) 0%,#123A68 100%);color:#fff;box-shadow:0 2px 10px rgba(10,32,60,.25)}
 .topbar-inner{max-width:880px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:10px}
-.topbar-inner .logo{flex:none;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center}
-.topbar-inner .logo svg{width:20px;height:20px}
+.topbar-inner .logo{flex:none;width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center}
+.topbar-inner .logo img{width:24px;height:24px;object-fit:contain;display:block}
 .topbar-titles{flex:1;min-width:0}
 .topbar-titles h1{font-size:17px;font-weight:700;letter-spacing:.5px;line-height:1.3}
 .topbar-titles p{font-size:12px;opacity:.78;line-height:1.3}
@@ -324,6 +324,105 @@ button.opt:hover{border-color:var(--primary-2)}
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important}
 }
+
+/* ===== 规章查询 ===== */
+.rules-hero{padding:16px;border-radius:var(--radius);background:linear-gradient(135deg,var(--primary) 0%,#123A68 100%);color:#fff;display:flex;align-items:center;gap:14px;margin-top:12px;cursor:pointer;box-shadow:var(--shadow);text-align:left;width:100%}
+.rules-hero:active{transform:scale(.985)}
+.rules-hero .r-ic{flex:none;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center}
+.rules-hero .r-ic svg{width:18px;height:18px}
+.rules-hero .r-tx{flex:1;min-width:0}
+.rules-hero .r-tx h3{font-size:16px;font-weight:700}
+.rules-hero .r-tx p{font-size:12.5px;color:rgba(255,255,255,.78);margin-top:2px;line-height:1.45}
+.rules-hero .r-go{flex:none;color:rgba(255,255,255,.85);display:flex;align-items:center}
+.rules-hero .r-go svg{width:18px;height:18px}
+.rule-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:left;width:100%;margin-top:10px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.rule-card:active{transform:scale(.985)}
+.rule-card .m-ic{flex:none;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.rule-card .m-ic svg{width:18px;height:18px}
+.rule-card .m-tx{flex:1;min-width:0}
+.rule-card .m-tx h3{font-size:15.5px;font-weight:700}
+.rule-card .m-tx p{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45}
+.rule-card .m-go{flex:none;color:#C3CEDC;display:flex;align-items:center}
+.rule-card .m-go svg{width:18px;height:18px}
+.rule-card:hover .m-go{color:var(--primary)}
+.rule-info{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.rule-info h2{font-size:17px;font-weight:700;line-height:1.45}
+.rule-info .code{display:inline-block;font-size:12px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:2px 9px;border-radius:6px;margin-top:8px}
+.rule-info dl{display:grid;grid-template-columns:70px 1fr;gap:7px 12px;margin-top:14px;font-size:13px}
+.rule-info dl dt{color:var(--muted)}
+.rule-info dl dd{color:var(--ink);line-height:1.6}
+.rule-sec h4{font-size:13px;font-weight:700;color:var(--muted);margin:18px 2px 8px;display:flex;align-items:center;gap:6px}
+.rule-sec h4::after{content:"";flex:1;height:1px;background:var(--line)}
+.toc-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 0;box-shadow:var(--shadow);font-size:13px}
+.toc-item{padding:9px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;border:none;background:none;width:100%;text-align:left;color:var(--ink)}
+.toc-item:hover{background:var(--primary-soft)}
+.toc-item.part{font-weight:700;color:var(--primary);font-size:13.5px}
+.toc-item.chapter{padding-left:30px;font-weight:500}
+.toc-item .dots{flex:1;border-bottom:1px dotted #C3CEDC;margin:0 6px;min-width:12px}
+.toc-item .cnt{color:#93A2B5;font-size:11.5px;flex:none}
+.toc-sub{padding:4px 16px 8px 54px;font-size:12.5px;color:var(--muted);line-height:1.75;display:none}
+.toc-sub.show{display:block}
+.toc-sub .sec{display:flex;gap:6px;align-items:baseline}
+.toc-sub .sec::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:#C3CEDC;position:relative;top:-1px}
+.link-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-top:8px;background:var(--surface);font-size:13px}
+.link-row .link-name{flex:1;min-width:0}
+.link-row .link-name a{display:block;color:var(--primary);text-decoration:none;word-break:break-all;line-height:1.5}
+.link-row .link-name small{display:block;color:#93A2B5;font-size:11px;word-break:break-all;margin-top:1px}
+.link-row .del{flex:none;color:var(--bad);background:none;border:none;cursor:pointer;padding:4px 6px;font-size:13px}
+.item-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:8px;font-size:13px;line-height:1.75;box-shadow:var(--shadow);position:relative}
+.item-card .it{font-weight:700;color:var(--primary);margin-bottom:5px;padding-right:44px}
+.item-card .ic{color:var(--ink);white-space:pre-wrap}
+.item-card .del{position:absolute;top:8px;right:10px;color:var(--bad);background:none;border:none;cursor:pointer;font-size:12px;padding:3px 6px}
+.empty-note{text-align:center;color:#93A2B5;font-size:12.5px;padding:24px 12px;line-height:1.8}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:600;font-size:13.5px;cursor:pointer;margin-bottom:12px;padding:6px 10px;border-radius:8px;background:none;border:none}
+.back-link:hover{background:var(--primary-soft)}
+.back-link svg{width:16px;height:16px}
+.add-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.add-btn{flex:1;min-width:130px;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 12px;border-radius:10px;font-size:13.5px;font-weight:600;border:1px dashed var(--primary-2);background:var(--primary-soft);color:var(--primary);cursor:pointer}
+.add-btn svg{width:16px;height:16px}
+.add-btn:active{transform:scale(.985)}
+.rule-tag{display:flex;align-items:center;gap:4px;font-size:11px;color:#93A2B5;margin-top:8px;flex-wrap:wrap}
+.rule-tag b{color:var(--primary);font-weight:700}
+.rule-count{font-size:12px;color:#93A2B5;margin-top:4px}
+.rule-del{flex:none;background:none;border:none;color:var(--bad);font-size:11.5px;cursor:pointer;padding:4px 6px;opacity:.85}
+.rule-del:hover{opacity:1}
+.r-item-search{display:flex;gap:6px;margin-top:10px}
+.r-item-search input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:13px;color:var(--ink)}
+.r-item-search input:focus{outline:none;border-color:var(--primary-2)}
+.r-item-search .clear{flex:none;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--muted);cursor:pointer;font-size:12.5px}
+.item-ops{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.mini-btn{flex:1;min-width:100px;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border-radius:9px;font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--primary);cursor:pointer}
+.mini-btn svg{width:14px;height:14px}
+.mini-btn.danger{color:var(--bad)}
+.mini-btn:active{transform:scale(.985)}
+.item-card .ops{display:flex;gap:6px;margin-top:8px}
+.item-card .ops button{flex:none;font-size:11.5px;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.item-card .ops button:active{transform:scale(.97)}
+/* 通用模态 */
+.rm-mask{position:fixed;inset:0;background:rgba(9,25,49,.55);z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .15s}
+.rm-mask.show{opacity:1;pointer-events:auto}
+.rm-box{width:100%;max-width:560px;max-height:86vh;overflow:auto;background:var(--surface);border-radius:14px;box-shadow:0 12px 40px rgba(9,25,49,.35);padding:18px;transform:translateY(10px);transition:transform .15s}
+.rm-mask.show .rm-box{transform:translateY(0)}
+.rm-box h3{font-size:15.5px;font-weight:700;margin-bottom:12px}
+.rm-box .fld{margin-bottom:10px}
+.rm-box .fld label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.rm-box .fld input,.rm-box .fld textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:13px;color:var(--ink);background:#fff;box-sizing:border-box}
+.rm-box .fld textarea{min-height:120px;resize:vertical;line-height:1.65}
+.rm-box .fld input:focus,.rm-box .fld textarea:focus{outline:none;border-color:var(--primary-2)}
+.rm-box .fld .hint{font-size:11px;color:#93A2B5;margin-top:3px;line-height:1.5}
+.rm-btns{display:flex;gap:10px;margin-top:14px}
+.rm-btns .ok{flex:1;padding:10px 12px;border:none;border-radius:9px;background:var(--primary);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer}
+.rm-btns .no{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--muted);font-size:13.5px;cursor:pointer}
+.rm-btns .ok:active,.rm-btns .no:active{transform:scale(.985)}
+/* 站内全文浏览 */
+.full-mask{position:fixed;inset:0;background:rgba(9,25,49,.55);z-index:130;display:flex;flex-direction:column;padding:12px;opacity:0;pointer-events:none;transition:opacity .15s}
+.full-mask.show{opacity:1;pointer-events:auto}
+.full-head{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:12px 12px 0 0;padding:10px 14px;box-shadow:0 -4px 14px rgba(9,25,49,.12)}
+.full-head b{flex:1;min-width:0;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.full-head a{color:var(--primary);font-size:12px;text-decoration:none;flex:none}
+.full-head .x{flex:none;background:none;border:none;color:var(--muted);cursor:pointer;font-size:17px;padding:2px 6px;line-height:1}
+.full-box{flex:1;background:#fff;border-radius:0 0 12px 12px;overflow:hidden;box-shadow:0 12px 40px rgba(9,25,49,.35)}
+.full-box iframe{width:100%;height:100%;border:0;background:#fff}
 </style>
 </head>
 <body>
@@ -331,10 +430,10 @@ button.opt:hover{border-color:var(--primary-2)}
 <header id="topbar">
   <div class="topbar-inner">
     <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l7 3v6c0 4.5-2.8 7-7 8-4.2-1-7-3.5-7-8V7l7-3z"/><path d="M9 12h6M9 15h4"/></svg>
+      <img src="assets/logo80.png" alt="中国铁路路徽">
     </div>
     <div class="topbar-titles">
-      <h1 id="topTitle">技规离线刷题</h1>
+      <h1 id="topTitle">长沙南车站刷题程序</h1>
       <p id="topSub">高铁《技规》示例题库 · 完全离线可用</p>
     </div>
     <div class="topbar-actions hidden" id="topActions">
@@ -464,7 +563,7 @@ const TYPE_COLORS = {single:'#15457C', multiple:'#1E8E5A', judge:'#B36F12', fill
 
 function storeGet(k, d){ try{ const v = localStorage.getItem(LS_PREFIX + k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function storeSet(k, v){ try{ localStorage.setItem(LS_PREFIX + k, JSON.stringify(v)); return true; }catch(e){ return false; } }
-function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function typeName(t){ return TYPE_NAMES[t] || t || ''; }
 function optKeyText(k){ return k; }
@@ -539,7 +638,10 @@ const ICONS = {
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>',
   restore:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
   arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
-  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>'
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',
+  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>'
 };
 
 /* ===== 状态 ===== */
@@ -625,6 +727,8 @@ function route(){
   else if(h === '#browse') renderBrowsePage();
   else if(h === '#search') renderSearchPage();
   else if(h === '#banks') renderBanksPage();
+  else if(h === '#rules') renderRulesPage();
+  else if(h.indexOf('#rule-') === 0) renderRuleDetail(h.slice(6));
   else renderHome();
   window.scrollTo(0, 0);
 }
@@ -697,7 +801,13 @@ function renderHome(){
       (isImported ? '<button class="tool-btn" id="tRestore">' + ICONS.restore + '恢复内置题库</button>' : '') +
       '<button class="tool-btn danger" id="tReset">' + ICONS.trash + '清空答题记录</button>' +
     '</div>' +
-    '<div class="foot-note">' + (isImported ? ('当前题库「' + esc(bankName) + '」 · ' + bank.length + ' 题') : '内置示例题答案已对照《技规》（高速铁路部分）及《高速铁路突发事件应急预案（试行）》核对<br>') + '答题记录与错题本保存在本机浏览器，数据不会上传网络</div>';
+    '<div class="foot-note">' + (isImported ? ('当前题库「' + esc(bankName) + '」 · ' + bank.length + ' 题') : '内置示例题答案已对照《技规》（高速铁路部分）及《高速铁路突发事件应急预案（试行）》核对<br>') + '答题记录与错题本保存在本机浏览器，数据不会上传网络</div>' +
+    '<div class="section-label">规章查询</div>' +
+    '<button class="rules-hero" id="rulesHero">' +
+      '<div class="r-ic">' + ICONS.book + '</div>' +
+      '<div class="r-tx"><h3>看规章</h3><p>高速/普速《技规》、广铁行细，可导入文件或添加网址查阅</p></div>' +
+      '<div class="r-go">' + ICONS.arrow + '</div>' +
+    '</button>';
 
   $('#importHero').addEventListener('click', openImport);
   $('#mOrder').addEventListener('click', () => startPractice('order', null));
@@ -711,6 +821,7 @@ function renderHome(){
   $('#tReset').addEventListener('click', resetRecords);
   $('#searchBtn').addEventListener('click', () => doSearch($('#searchInput').value));
   $('#searchInput').addEventListener('keydown', e => { if(e.key === 'Enter') doSearch($('#searchInput').value); });
+  $('#rulesHero').addEventListener('click', () => { location.hash = '#rules'; });
 }
 
 /* ===== 题型选择 ===== */
@@ -1893,8 +2004,469 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){
     if(S.sheetOpen) closeSheet();
     else if($('#importModal').classList.contains('show')) closeImport();
+    else {
+      const fm = document.querySelector('.full-mask.show');
+      if(fm){ fm.classList.remove('show'); setTimeout(() => fm.remove(), 200); }
+      else {
+        const rm = document.querySelector('.rm-mask.show');
+        if(rm){ rm.classList.remove('show'); setTimeout(() => rm.remove(), 180); }
+      }
+    }
   }
 });
+
+/* ===== 规章查询 ===== */
+const RULE_META = {
+  gs: {
+    id:'gs', name:'铁路技术管理规程（高速铁路部分）', code:'TG/01—2014',
+    issuer:'中国铁路总公司发布', scope:'适用于200 km/h及以上的铁路和200 km/h以下仅运行动车组列车的铁路；200 km/h客货共线铁路有关货运技术设备的要求参照普速铁路部分执行。',
+    source:'国家铁路局备案，中国铁道出版社出版', cls:'ic-blue',
+    links:[
+      {name:'国家铁路局 · 规章库（权威来源）', url:'https://www.nra.gov.cn/xxgk/gkml/ztjg/gfzd/'},
+      {name:'国家铁路局 · 《铁路技术管理规程》（2006年铁道部令第29号）全文', url:'https://www.nra.gov.cn/xxgk/gkml/ztjg/gfzd/bmgz/202206/t20220624_327439.shtml', full:true}
+    ],
+    toc:[
+      {t:'总则'},
+      {t:'第一编 技术设备', ch:[
+        {t:'第一章 基本要求', sec:['基建、制造及其验收交接','限界、安全保护区','养护维修及检查','救援设备','灾害防护','行车安全监测设备']},
+        {t:'第二章 线路、桥梁及隧道', sec:['一般要求','铁路线路','线路平面及纵断面','路基','桥隧建(构)筑物','轨道','线路交叉及接轨','防护栅栏','声屏障']},
+        {t:'第三章 信号、通信', sec:['一般要求','信号','联锁','闭塞','调度集中系统','机车信号、列车运行监控装置、轨道车运行控制设备','列车运行控制系统','信号集中监测系统','通信','承载网','业务网','支撑网','信号、通信线路及其他']},
+        {t:'第四章 铁路信息系统', sec:[]},
+        {t:'第五章 车站及枢纽', sec:['站场设备','客运设备']},
+        {t:'第六章 机车车辆', sec:['机车设备','机车','车辆设备','车辆','动车组设备','动车组','自轮运转特种设备']},
+        {t:'第七章 供电、给水', sec:['牵引供电','电力、给水']},
+        {t:'第八章 房屋建筑', sec:[]},
+        {t:'第九章 铁路用地', sec:[]}
+      ]},
+      {t:'第二编 行车组织', ch:[
+        {t:'第十章 基本要求', sec:[]},
+        {t:'第十一章 编组列车', sec:[]},
+        {t:'第十二章 调度指挥', sec:[]},
+        {t:'第十三章 列车运行', sec:[]},
+        {t:'第十四章 限速管理', sec:[]},
+        {t:'第十五章 调车工作', sec:[]},
+        {t:'第十六章 施工维修', sec:[]},
+        {t:'第十七章 灾害天气行车', sec:[]},
+        {t:'第十八章 设备故障行车', sec:[]},
+        {t:'第十九章 非正常行车组织', sec:[]},
+        {t:'第二十章 救援', sec:[]}
+      ]},
+      {t:'第三编 信号显示', ch:[
+        {t:'第二十一章 基本要求', sec:[]},
+        {t:'第二十二章 固定信号', sec:[]},
+        {t:'第二十三章 移动信号及手信号', sec:[]},
+        {t:'第二十四章 信号表示器及标志', sec:[]},
+        {t:'第二十五章 听觉信号', sec:[]}
+      ]},
+      {t:'附图', sec:['附图1 客运专线铁路建筑限界','附图2 客运专线铁路机车车辆限界']}
+    ]
+  },
+  ps: {
+    id:'ps', name:'铁路技术管理规程（普速铁路部分）', code:'TG/01—2014',
+    issuer:'中国铁路总公司发布', scope:'适用于200 km/h以下的普速铁路，是国家铁路技术管理的基本规章，是各部门、单位制定铁路技术管理文件的依据和基础。',
+    source:'国家铁路局备案，中国铁道出版社出版', cls:'ic-green',
+    links:[
+      {name:'国家铁路局 · 规章库（权威来源）', url:'https://www.nra.gov.cn/xxgk/gkml/ztjg/gfzd/'},
+      {name:'国家铁路局 · 《铁路技术管理规程》（2006年铁道部令第29号）全文', url:'https://www.nra.gov.cn/xxgk/gkml/ztjg/gfzd/bmgz/202206/t20220624_327439.shtml', full:true}
+    ],
+    toc:[
+      {t:'总则'},
+      {t:'第一编 技术设备', ch:[
+        {t:'第一章 基本要求', sec:['基建、制造及其验收交接','限界、安全保护区','养护维修及检查','救援设备','灾害防护','行车安全监测设备']},
+        {t:'第二章 线路、桥梁及隧道', sec:['一般要求','铁路线路','线路平面及纵断面','路基','桥隧建(构)筑物','轨道','道口、交叉及线路接轨','安全线及避难线','防护栅栏','声屏障']},
+        {t:'第三章 信号、通信', sec:['一般要求','信号','联锁','闭塞','列车调度指挥系统、调度集中系统','机车信号、列车运行监控装置、轨道车运行控制设备','CTCS-2级列控系统','信号集中监测系统','驼峰信号','道口自动信号及自动通知','通信']},
+        {t:'第四章 铁路信息系统', sec:[]},
+        {t:'第五章 车站及枢纽', sec:['站场设备','客运设备','货运设备']},
+        {t:'第六章 机车车辆', sec:['机车设备','机车','车辆设备','车辆','动车组设备','动车组','自轮运转特种设备']},
+        {t:'第七章 供电、给水', sec:['牵引供电','电力、给水']},
+        {t:'第八章 房屋建筑', sec:[]},
+        {t:'第九章 铁路用地', sec:[]}
+      ]},
+      {t:'第二编 行车组织', ch:[
+        {t:'第十章 基本要求', sec:['行车组织原则','行车指挥','车站技术管理','对行车有关人员的要求']},
+        {t:'第十一章 编组列车', sec:[]},
+        {t:'第十二章 调车工作', sec:[]},
+        {t:'第十三章 行车闭塞', sec:[]},
+        {t:'第十四章 列车运行', sec:[]}
+      ]},
+      {t:'第三编 信号显示', ch:[
+        {t:'第十五章 基本要求', sec:[]},
+        {t:'第十六章 固定信号', sec:['色灯信号机','臂板信号机','机车信号机']},
+        {t:'第十七章 移动信号及手信号', sec:['移动信号','响墩及火炬信号','无线调车灯显信号','手信号']},
+        {t:'第十八章 信号表示器及标志', sec:['信号表示器','线路标志及信号标志','线路安全保护标志','列车标志']},
+        {t:'第十九章 听觉信号', sec:[]}
+      ]},
+      {t:'附图与附件', sec:['附图 2 种（铁路建筑限界、机车车辆限界）','附件 10 个']}
+    ]
+  },
+  xx: {
+    id:'xx', name:'广州局集团公司行车组织细则', code:'（行细）',
+    issuer:'中国铁路广州局集团有限公司发布', scope:'广铁集团管内行车组织细则（含高速与普速作业标准），属局内规章，公开渠道暂无全文。',
+    source:'广铁集团内部规章（以本单位正式发布文本为准）', cls:'ic-amber',
+    links:[
+      {name:'中国国家铁路集团有限公司（广铁集团所属单位信息）', url:'https://www.china-railway.com.cn/'}
+    ],
+    toc:[
+      {t:'说明', sec:['本细则为广铁集团内部规章，公开渠道暂无全文。','可将单位下发的行细电子文本（TXT / JSON）导入本页浏览，或添加内部网址查阅。','条文内容以广铁集团正式发布文本为准。']}
+    ]
+  }
+};
+
+function tocHtml(r){
+  let h = '';
+  (r.toc || []).forEach(part => {
+    if(part.ch){
+      h += '<div class="toc-item part">' + esc(part.t) + '<span class="dots"></span><span class="cnt">' + part.ch.length + ' 章</span></div>';
+      h += '<div class="toc-sub">';
+      part.ch.forEach(ch => {
+        h += '<div class="toc-item chapter">' + esc(ch.t) + (ch.sec && ch.sec.length ? '<span class="dots"></span><span class="cnt">' + ch.sec.length + ' 节</span>' : '') + '</div>';
+        if(ch.sec && ch.sec.length){
+          h += '<div class="toc-sub">' + ch.sec.map(s => '<div class="sec">' + esc(s) + '</div>').join('') + '</div>';
+        }
+      });
+      h += '</div>';
+    } else {
+      h += '<div class="toc-item part">' + esc(part.t) + (part.sec && part.sec.length ? '<span class="dots"></span><span class="cnt">' + part.sec.length + ' 项</span>' : '') + '</div>';
+      if(part.sec && part.sec.length){
+        h += '<div class="toc-sub">' + part.sec.map(s => '<div class="sec">' + esc(s) + '</div>').join('') + '</div>';
+      }
+    }
+  });
+  return h || '<div class="empty-note">暂无目录</div>';
+}
+
+function getCustomRules(){ return storeGet('rules_custom', []); }
+function saveCustomRules(list){ storeSet('rules_custom', list); }
+
+function renderRulesPage(){
+  S.practice = null;
+  $('#topTitle').textContent = '看规章';
+  $('#topSub').textContent = '高速/普速《技规》、广铁行细 · 来源正规';
+  $('#topActions').classList.add('hidden');
+  hideBottomBars();
+
+  const customs = getCustomRules();
+  let inner = '<button class="back-link" id="rBackHome">' + ICONS.back + '返回主页</button>';
+  inner += '<div class="rule-info"><h2>规章查询</h2><div class="rule-tag">来源：国家铁路局 / 中国国家铁路集团正式发布文本；可导入文件、添加网址，或自行补充条文与规章</div></div>';
+  Object.keys(RULE_META).forEach(id => {
+    const r = RULE_META[id];
+    const items = storeGet('rules_items_' + id, []);
+    const links = storeGet('rules_links_' + id, []);
+    inner += '<button class="rule-card" data-rid="' + id + '">' +
+      '<div class="m-ic ' + r.cls + '">' + ICONS.book + '</div>' +
+      '<div class="m-tx"><h3>' + esc(r.name) + '</h3>' +
+      '<p>' + esc(r.code) + ' · ' + esc(r.issuer) + '</p>' +
+      '<div class="rule-count">目录 ' + (r.toc || []).length + ' 项 · 条文 ' + items.length + ' 条 · 网址 ' + (r.links.length + links.length) + ' 个</div>' +
+      '</div><div class="m-go">' + ICONS.arrow + '</div></button>';
+  });
+  customs.forEach(c => {
+    const items = storeGet('rules_items_' + c.id, []);
+    const links = storeGet('rules_links_' + c.id, []);
+    inner += '<div class="rule-card" data-rid="' + c.id + '">' +
+      '<div class="m-ic ' + (c.cls || 'ic-blue') + '">' + ICONS.book + '</div>' +
+      '<div class="m-tx"><h3>' + esc(c.name) + '</h3>' +
+      '<p>' + esc(c.code || '') + (c.issuer ? ' · ' + esc(c.issuer) : '') + '</p>' +
+      '<div class="rule-count">自定义规章 · 条文 ' + items.length + ' 条 · 网址 ' + links.length + ' 个</div>' +
+      '</div><button class="rule-del" data-del-rid="' + c.id + '">删除</button><div class="m-go">' + ICONS.arrow + '</div></div>';
+  });
+  inner += '<button class="add-btn" id="rAddRule" style="margin-top:12px">添加新规章</button>';
+
+  $('#view').innerHTML = inner;
+  $('#rBackHome').addEventListener('click', () => { location.hash = ''; });
+  document.querySelectorAll('.rule-card').forEach(c => {
+    c.addEventListener('click', () => { location.hash = '#rule-' + c.dataset.rid; });
+  });
+  document.querySelectorAll('[data-del-rid]').forEach(b => {
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = b.dataset.delRid;
+      if(!window.confirm('确定删除该自定义规章？其条文与网址记录一并清除。')) return;
+      const list = getCustomRules().filter(x => x.id !== id);
+      saveCustomRules(list);
+      localStorage.removeItem('tgr_rules_items_' + id);
+      localStorage.removeItem('tgr_rules_links_' + id);
+      toast('已删除规章', 'ok');
+      renderRulesPage();
+    });
+  });
+  $('#rAddRule').addEventListener('click', openNewRuleModal);
+}
+
+function renderRuleDetail(id){
+  let r = RULE_META[id];
+  let isCustom = false;
+  if(!r){
+    r = getCustomRules().find(x => x.id === id);
+    if(!r){ location.hash = '#rules'; return; }
+    isCustom = true;
+  }
+  S.practice = null;
+  $('#topTitle').textContent = '看规章';
+  $('#topSub').textContent = r.name;
+  $('#topActions').classList.add('hidden');
+  hideBottomBars();
+
+  const items = storeGet('rules_items_' + id, []);
+  const userLinks = storeGet('rules_links_' + id, []);
+  const allLinks = (r.links || []).concat(userLinks.map(l => ({ name: l.name, url: l.url, user: true })));
+
+  let inner = '<button class="back-link" id="rBack">' + ICONS.back + '规章列表</button>';
+  if(isCustom){
+    inner += '<div class="item-ops" style="margin-top:-4px"><button class="mini-btn" id="rEditRule">编辑规章信息</button></div>';
+  }
+  inner += '<div class="rule-info"><h2>' + esc(r.name) + '</h2>' + (r.code ? '<div class="code">' + esc(r.code) + '</div>' : '') + '<dl>' +
+    '<dt>发布</dt><dd>' + esc(r.issuer || '—') + '</dd>' +
+    '<dt>适用</dt><dd>' + esc(r.scope || '—') + '</dd>' +
+    '<dt>来源</dt><dd>' + esc(r.source || '—') + '</dd>' +
+    '</dl><div class="rule-tag">条文内容以正式发布文本为准；导入与修改内容保存在本机浏览器</div></div>';
+
+  inner += '<div class="rule-sec"><h4>来源网址</h4>';
+  if(allLinks.length){
+    allLinks.forEach((l, i) => {
+      inner += '<div class="link-row"><div class="link-name"><a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.name) + '</a><small>' + esc(l.url) + '</small></div>' +
+        (l.full ? '<button class="del" data-full="' + i + '" title="在本站内浏览全文">站内浏览</button>' : '') +
+        (l.user ? '<button class="del" data-del-link="' + i + '">删除</button>' : '') + '</div>';
+    });
+  } else {
+    inner += '<div class="empty-note">暂无网址，点击下方「添加网址」补充</div>';
+  }
+  inner += '<div class="add-row"><button class="add-btn" id="rAddLink">添加网址</button></div></div>';
+
+  if(r.toc && r.toc.length){
+    inner += '<div class="rule-sec"><h4>目录结构</h4><div class="toc-box">' + tocHtml(r) + '</div></div>';
+  }
+
+  inner += '<div class="rule-sec"><h4>条文内容（' + items.length + ' 条）</h4>';
+  inner += '<div class="r-item-search"><input id="rItemSearch" placeholder="搜索条文号或内容…"><button class="clear" id="rItemClear">清空</button></div>';
+  inner += '<div class="item-ops"><button class="mini-btn" id="rAddItem">新增条文</button><button class="mini-btn" id="rAddFile">导入文件（TXT / JSON）</button></div>';
+  inner += '<div id="rItemList"></div></div>';
+
+  $('#view').innerHTML = inner;
+
+  $('#rBack').addEventListener('click', () => { location.hash = '#rules'; });
+  if(isCustom) $('#rEditRule').addEventListener('click', () => openNewRuleModal(id));
+  $('#rAddLink').addEventListener('click', () => addRuleLink(id));
+  $('#rAddFile').addEventListener('click', () => pickRuleFile(id));
+  $('#rAddItem').addEventListener('click', () => openItemModal(id, -1));
+  $('#rItemSearch').addEventListener('input', () => renderRuleItems(id));
+  $('#rItemClear').addEventListener('click', () => { $('#rItemSearch').value = ''; renderRuleItems(id); });
+  renderRuleItems(id);
+
+  document.querySelectorAll('.toc-item.part').forEach(p => {
+    p.addEventListener('click', () => { const s = p.nextElementSibling; if(s && s.classList.contains('toc-sub')) s.classList.toggle('show'); });
+  });
+  document.querySelectorAll('.toc-item.chapter').forEach(c => {
+    c.addEventListener('click', () => { const s = c.nextElementSibling; if(s && s.classList.contains('toc-sub')) s.classList.toggle('show'); });
+  });
+  document.querySelectorAll('[data-full]').forEach(b => {
+    b.addEventListener('click', () => {
+      const i = +b.dataset.full;
+      renderRuleFull(allLinks[i].url, allLinks[i].name);
+    });
+  });
+  document.querySelectorAll('[data-del-link]').forEach(b => {
+    b.addEventListener('click', () => {
+      const i = +b.dataset.delLink;
+      const arr = storeGet('rules_links_' + id, []);
+      arr.splice(i, 1);
+      storeSet('rules_links_' + id, arr);
+      toast('已删除该网址');
+      renderRuleDetail(id);
+    });
+  });
+}
+
+function renderRuleItems(id){
+  const items = storeGet('rules_items_' + id, []);
+  const box = $('#rItemList');
+  if(!box) return;
+  const kw = ($('#rItemSearch').value || '').trim().toLowerCase();
+  if(!items.length){
+    box.innerHTML = '<div class="empty-note">尚未导入条文内容。<br>点击「导入文件」选择 TXT 或 JSON（按「第N条」分段，或 JSON 数组 [{t,c}]）；或点「新增条文」逐条添加。</div>';
+    return;
+  }
+  const list = items.map((it, i) => ({ it, i })).filter(x => !kw || (x.it.t || '').toLowerCase().indexOf(kw) >= 0 || (x.it.c || '').toLowerCase().indexOf(kw) >= 0);
+  if(!list.length){
+    box.innerHTML = '<div class="empty-note">没有匹配「' + esc(kw) + '」的条文</div>';
+    return;
+  }
+  box.innerHTML = list.map(x => {
+    return '<div class="item-card"><div class="it">' + esc(x.it.t || '条文 ' + (x.i + 1)) + '</div>' +
+      '<div class="ic">' + esc(x.it.c) + '</div>' +
+      '<div class="ops"><button data-edit="' + x.i + '">编辑</button><button data-del="' + x.i + '">删除</button></div></div>';
+  }).join('');
+  box.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openItemModal(id, +b.dataset.edit)));
+  box.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    const i = +b.dataset.del;
+    const arr = storeGet('rules_items_' + id, []);
+    arr.splice(i, 1);
+    storeSet('rules_items_' + id, arr);
+    toast('已删除该条文');
+    renderRuleDetail(id);
+  }));
+}
+
+function openModal(html){
+  const mask = document.createElement('div');
+  mask.className = 'rm-mask';
+  mask.innerHTML = '<div class="rm-box">' + html + '</div>';
+  document.body.appendChild(mask);
+  requestAnimationFrame(() => mask.classList.add('show'));
+  const close = () => { mask.classList.remove('show'); setTimeout(() => mask.remove(), 180); };
+  mask.addEventListener('click', e => { if(e.target === mask) close(); });
+  return { mask, close };
+}
+
+function openItemModal(id, index){
+  const items = storeGet('rules_items_' + id, []);
+  const it = index >= 0 ? items[index] : { t: '', c: '' };
+  const m = openModal(
+    '<h3>' + (index >= 0 ? '编辑条文' : '新增条文') + '</h3>' +
+    '<div class="fld"><label>条文标题（如：第5条）</label><input id="miT" value="' + esc(it.t || '') + '"></div>' +
+    '<div class="fld"><label>条文内容</label><textarea id="miC">' + esc(it.c || '') + '</textarea></div>' +
+    '<div class="rm-btns"><button class="ok" id="miOk">保存</button><button class="no" id="miNo">取消</button></div>'
+  );
+  m.mask.querySelector('#miOk').addEventListener('click', () => {
+    const t = m.mask.querySelector('#miT').value.trim();
+    const c = m.mask.querySelector('#miC').value.trim();
+    if(!c){ toast('条文内容不能为空', 'bad'); return; }
+    const arr = storeGet('rules_items_' + id, []);
+    if(index >= 0) arr[index] = { t: t || arr[index].t, c: c };
+    else arr.push({ t: t || ('条文 ' + (arr.length + 1)), c: c });
+    storeSet('rules_items_' + id, arr);
+    m.close();
+    toast(index >= 0 ? '条文已更新' : '已新增条文', 'ok');
+    renderRuleDetail(id);
+  });
+  m.mask.querySelector('#miNo').addEventListener('click', m.close);
+}
+
+function openNewRuleModal(editId){
+  const custom = editId ? getCustomRules().find(x => x.id === editId) : null;
+  const m = openModal(
+    '<h3>' + (custom ? '编辑规章' : '添加新规章') + '</h3>' +
+    '<div class="fld"><label>规章名称 *</label><input id="nrName" value="' + esc(custom ? custom.name : '') + '" placeholder="如：××集团公司××细则"></div>' +
+    '<div class="fld"><label>文号 / 编号</label><input id="nrCode" value="' + esc(custom ? custom.code : '') + '" placeholder="如：TG/01—2014"></div>' +
+    '<div class="fld"><label>发布单位</label><input id="nrIssuer" value="' + esc(custom ? custom.issuer : '') + '"></div>' +
+    '<div class="fld"><label>适用范围</label><textarea id="nrScope" style="min-height:60px">' + esc(custom ? custom.scope : '') + '</textarea></div>' +
+    '<div class="fld"><label>来源说明</label><input id="nrSource" value="' + esc(custom ? custom.source : '') + '" placeholder="如：单位正式发布文本"></div>' +
+    '<div class="rm-btns"><button class="ok" id="nrOk">保存</button><button class="no" id="nrNo">取消</button></div>'
+  );
+  m.mask.querySelector('#nrOk').addEventListener('click', () => {
+    const name = m.mask.querySelector('#nrName').value.trim();
+    if(!name){ toast('请填写规章名称', 'bad'); return; }
+    const list = getCustomRules();
+    if(custom){
+      const idx = list.findIndex(x => x.id === custom.id);
+      list[idx] = Object.assign({}, list[idx], {
+        name: name,
+        code: m.mask.querySelector('#nrCode').value.trim(),
+        issuer: m.mask.querySelector('#nrIssuer').value.trim(),
+        scope: m.mask.querySelector('#nrScope').value.trim(),
+        source: m.mask.querySelector('#nrSource').value.trim()
+      });
+    } else {
+      list.push({
+        id: 'u_' + Date.now(),
+        name: name,
+        code: m.mask.querySelector('#nrCode').value.trim(),
+        issuer: m.mask.querySelector('#nrIssuer').value.trim(),
+        scope: m.mask.querySelector('#nrScope').value.trim(),
+        source: m.mask.querySelector('#nrSource').value.trim(),
+        cls: 'ic-amber', links: [], toc: []
+      });
+    }
+    saveCustomRules(list);
+    m.close();
+    toast(custom ? '规章已更新' : '已添加新规章', 'ok');
+    renderRulesPage();
+  });
+  m.mask.querySelector('#nrNo').addEventListener('click', m.close);
+}
+
+function renderRuleFull(url, title){
+  const mask = document.createElement('div');
+  mask.className = 'full-mask';
+  mask.innerHTML = '<div class="full-head"><b>' + esc(title || '规章全文') + '</b><a href="' + esc(url) + '" target="_blank" rel="noopener">新窗口打开</a><button class="x" id="fullX">×</button></div><div class="full-box"><iframe src="' + esc(url) + '" loading="lazy"></iframe></div>';
+  document.body.appendChild(mask);
+  requestAnimationFrame(() => mask.classList.add('show'));
+  const close = () => { mask.classList.remove('show'); setTimeout(() => mask.remove(), 200); };
+  mask.querySelector('#fullX').addEventListener('click', close);
+  mask.addEventListener('click', e => { if(e.target === mask) close(); });
+}
+
+function pickRuleFile(id){
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.txt,.json,text/plain,application/json';
+  inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', () => {
+    const f = inp.files && inp.files[0];
+    if(!f){ document.body.removeChild(inp); return; }
+    const rd = new FileReader();
+    rd.onload = () => {
+      const items = parseRuleText(String(rd.result || ''));
+      if(!items.length){ toast('未识别到条文内容，请确认文件格式', 'bad'); document.body.removeChild(inp); return; }
+      const old = storeGet('rules_items_' + id, []);
+      storeSet('rules_items_' + id, old.concat(items));
+      toast('已导入 ' + items.length + ' 条条文', 'ok');
+      renderRuleDetail(id);
+      document.body.removeChild(inp);
+    };
+    rd.onerror = () => { toast('文件读取失败', 'bad'); document.body.removeChild(inp); };
+    rd.readAsText(f);
+  });
+  inp.click();
+}
+
+function parseRuleText(text){
+  const t = String(text || '').trim();
+  if(!t) return [];
+  if(t[0] === '[' || t[0] === '{'){
+    try{
+      const j = JSON.parse(t);
+      const arr = Array.isArray(j) ? j : (j.items || j.rules || j.data || []);
+      if(arr && arr.length && typeof arr[0] === 'object'){
+        const out = arr.map(x => ({ t: String(x.t || x.title || x.no || ''), c: String(x.c || x.content || x.text || '') })).filter(x => x.c);
+        if(out.length) return out;
+      }
+    }catch(e){ /* 非 JSON，按 TXT 处理 */ }
+  }
+  const lines = t.split(/\r?\n/);
+  const items = [];
+  let cur = null;
+  const re = /^[【\[]?\s*(第\s*[0-9一二三四五六七八九十百千]+(?:[-–][0-9一二三四五六七八九十百千]+)?\s*条)([】\]]?\s*(.*))?$/;
+  lines.forEach(ln => {
+    const s = ln.trim();
+    if(!s) return;
+    const m = s.match(re);
+    if(m){
+      if(cur && cur.c) items.push(cur);
+      cur = { t: m[1].trim(), c: (m[3] || '').trim() };
+      return;
+    }
+    if(cur) cur.c += (cur.c ? '\n' : '') + s;
+  });
+  if(cur && cur.c) items.push(cur);
+  if(!items.length){
+    const clean = lines.map(s => s.trim()).filter(Boolean).join('\n');
+    if(clean) return [{ t: '全文文本', c: clean }];
+  }
+  return items;
+}
+
+function addRuleLink(id){
+  const name = window.prompt('网址名称（如：国家铁路局 · 技规全文）：');
+  if(name === null || name === undefined) return;
+  const url = window.prompt('网址（需以 https:// 开头）：');
+  if(!url || !/^https?:\/\/\S+$/i.test(url.trim())){ toast('请输入以 https:// 开头的有效网址', 'bad'); return; }
+  const links = storeGet('rules_links_' + id, []);
+  links.push({ name: (name.trim() || '自定义网址'), url: url.trim() });
+  storeSet('rules_links_' + id, links);
+  toast('已添加网址', 'ok');
+  renderRuleDetail(id);
+}
 
 route();
 </script>
