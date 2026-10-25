@@ -69,6 +69,7 @@ input,textarea{font-family:inherit}
 .ic-green{background:#E4F4EC;color:var(--ok)}
 .ic-amber{background:var(--accent-soft);color:#B36F12}
 .ic-violet{background:#EFE9F8;color:#6A4FA3}
+.ic-gold{background:#FDF3E0;color:#C77E1A}
 
 /* ===== 题型选择 ===== */
 .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
@@ -96,8 +97,12 @@ input,textarea{font-family:inherit}
 .pbar{background:linear-gradient(90deg,var(--primary),var(--primary-2));height:100%;border-radius:99px;transition:width .25s}
 .pmeta{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:10px}
 .pmeta b{color:var(--primary)}
-.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow)}
-.q-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);position:relative}
+.q-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding-right:44px}
+.fav-btn{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:#C3CEDC;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s,color .12s}
+.fav-btn svg{width:18px;height:18px}
+.fav-btn:active{transform:scale(.92)}
+.fav-btn.on{color:#F5A623;border-color:#F5A623;background:#FDF3E0}
 .q-tag{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px}
 .q-tag.type{background:var(--primary-soft);color:var(--primary)}
 .q-tag.cat{background:#F0F3F7;color:var(--muted)}
@@ -277,6 +282,7 @@ button.opt:hover{border-color:var(--primary-2)}
 .import-hero .i-go svg{width:18px;height:18px}
 .badge{flex:none;min-width:26px;padding:2px 9px;border-radius:99px;background:var(--bad);color:#fff;font-size:12px;font-weight:700;text-align:center}
 .badge.zero{background:#D8E0EA;color:#8A97A8}
+.badge.amber{background:#F5A623;color:#fff}
 .shuffle-btn{font-size:12.5px;font-weight:700;color:var(--primary);background:var(--primary-soft);border:none;border-radius:99px;padding:5px 12px;cursor:pointer}
 .shuffle-btn.on{background:var(--primary);color:#fff}
 .search-bar{display:flex;gap:8px;margin-bottom:14px}
@@ -567,6 +573,30 @@ function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace
 function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function typeName(t){ return TYPE_NAMES[t] || t || ''; }
 function optKeyText(k){ return k; }
+/* 左右滑动切换题目：水平滑动距离≥50px 生效，垂直滚动不干扰 */
+function attachSwipe(el, onLeft, onRight){
+  if(!el || el.__swipe) return;
+  el.__swipe = true;
+  let sx = 0, sy = 0, axis = null;
+  el.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    sx = t.clientX; sy = t.clientY; axis = null;
+  }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    if(axis) return;
+    const t = e.touches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Math.abs(dx) > 12 || Math.abs(dy) > 12) axis = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+  }, { passive: true });
+  el.addEventListener('touchend', e => {
+    if(axis !== 'h'){ axis = null; return; }
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    axis = null;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0) onLeft(); else onRight();
+  });
+}
 function optText(q, k){
   const i = 'ABCD'.indexOf(k);
   if(i >= 0 && q.opts && q.opts[i]) return q.opts[i].replace(/^[A-D]\s*[.、．]\s*/, '');
@@ -578,7 +608,13 @@ function ansText(q){
   const arr = Array.isArray(q.ans) ? q.ans : [q.ans];
   return arr.join('、') + '（' + arr.map(k => optText(q, k)).join('；') + '）';
 }
-function saveRecords(){ storeSet('rec_' + bankName, records); storeSet('wrong_' + bankName, Array.from(wrongSet)); }
+function saveRecords(){ storeSet('rec_' + bankName, records); storeSet('wrong_' + bankName, Array.from(wrongSet)); storeSet('fav_' + bankName, Array.from(favSet)); }
+function toggleFav(id){
+  if(!qById(id)) return false;
+  if(favSet.has(id)) favSet.delete(id); else favSet.add(id);
+  saveRecords();
+  return favSet.has(id);
+}
 
 /* ===== 练习进度记忆（上次做题历史） =====
    以「题库|模式|题型」为会话键保存未完成练习进度；
@@ -641,12 +677,15 @@ const ICONS = {
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
   book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
   link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',
-  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>'
+  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
+  starF:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>'
 };
 
 /* ===== 状态 ===== */
 let records = {};
 let wrongSet = new Set();
+let favSet = new Set();
 let BANKS = [];
 let bankName = '内置示例题';
 let bank = RAW_QUESTIONS;
@@ -662,6 +701,7 @@ function saveBanks(){ storeSet('banks', BANKS); }
 function loadRecs(){
   records = storeGet('rec_' + bankName, {});
   wrongSet = new Set(storeGet('wrong_' + bankName, []));
+  favSet = new Set(storeGet('fav_' + bankName, []));
 }
 function refreshBank(){
   let b = bankDef(bankName);
@@ -740,7 +780,7 @@ function homeStats(){
   Object.keys(records).forEach(k => { const r = records[k]; attempts += (r.t || 0); correct += (r.c || 0); });
   const done = Object.keys(records).length;
   const rate = attempts ? Math.round(correct / attempts * 100) : 0;
-  return {total: bank.length, done, attempts, correct, rate, wrong: wrongSet.size};
+  return {total: bank.length, done, attempts, correct, rate, wrong: wrongSet.size, fav: favSet.size};
 }
 
 function renderHome(){
@@ -752,6 +792,7 @@ function renderHome(){
 
   const st = homeStats();
   const wrongBadge = st.wrong ? '<span class="badge">' + st.wrong + '</span>' : '<span class="badge zero">0</span>';
+  const favBadge = st.fav ? '<span class="badge amber">' + st.fav + '</span>' : '<span class="badge zero">0</span>';
 
   $('#view').innerHTML =
     '<div class="import-hero" id="importHero">' +
@@ -787,6 +828,12 @@ function renderHome(){
         wrongBadge +
         '<div class="m-go">' + ICONS.arrow + '</div>' +
       '</button>' +
+      '<button class="mode-card" id="mFav">' +
+        '<div class="m-ic ic-gold">' + ICONS.star + '</div>' +
+        '<div class="m-tx"><h3>收藏练习</h3><p>只练自己收藏的题目，题目右上角星标一键收藏</p></div>' +
+        favBadge +
+        '<div class="m-go">' + ICONS.arrow + '</div>' +
+      '</button>' +
       '<button class="mode-card" id="mBrowse">' +
         '<div class="m-ic ic-violet">' + ICONS.browse + '</div>' +
         '<div class="m-tx"><h3>背题模式</h3><p>不答题，直接浏览题目、答案与解析，不计入记录</p></div>' +
@@ -813,6 +860,7 @@ function renderHome(){
   $('#mOrder').addEventListener('click', () => startPractice('order', null));
   $('#mType').addEventListener('click', () => { location.hash = '#types'; });
   $('#mWrong').addEventListener('click', () => startPractice('wrong', null));
+  $('#mFav').addEventListener('click', () => startPractice('fav', null));
   $('#mBrowse').addEventListener('click', () => { buildBrowse(); location.hash = '#browse'; });
   $('#tImport').addEventListener('click', openImport);
   $('#tBanks').addEventListener('click', () => { location.hash = '#banks'; });
@@ -861,11 +909,12 @@ function startPractice(mode, type, optIds, label){
   if(optIds && optIds.length) qids = optIds.slice();
   else if(mode === 'type') qids = bank.filter(q => q.type === type).map(q => q.id);
   else if(mode === 'wrong') qids = Array.from(wrongSet);
+  else if(mode === 'fav') qids = Array.from(favSet).filter(id => qById(id));
   else qids = bank.map(q => q.id);
 
   if(!qids.length){
-    toast(mode === 'wrong' ? '错题本还是空的，先去刷几题吧' : '题库中暂无此类题目，可先上传题库', 'bad');
-    if(mode === 'wrong' && location.hash === '#home') return;
+    toast(mode === 'wrong' ? '错题本还是空的，先去刷几题吧' : mode === 'fav' ? '还没有收藏题目，点题目右上角的星标即可收藏' : '题库中暂无此类题目，可先上传题库', 'bad');
+    if((mode === 'wrong' || mode === 'fav') && location.hash === '#home') return;
     if(location.hash !== '#home') location.hash = '#home';
     return;
   }
@@ -886,7 +935,7 @@ function startPractice(mode, type, optIds, label){
 }
 
 function practiceModeLabel(P){
-  return P.label || (P.mode === 'order' ? '顺序刷题' : P.mode === 'type' ? '题型练习 · ' + typeName(P.type) : '错题训练');
+  return P.label || (P.mode === 'order' ? '顺序刷题' : P.mode === 'type' ? '题型练习 · ' + typeName(P.type) : P.mode === 'fav' ? '收藏练习' : '错题训练');
 }
 
 function renderPracticePage(){
@@ -920,6 +969,8 @@ function renderPracticePage(){
 
   $('#view').innerHTML = body;
 
+  attachSwipe($('#qCard'), goNext, goPrev);
+
   $('#shuffleBtn').addEventListener('click', toggleShuffle);
   $('#autoBtn').addEventListener('click', toggleAutoSubmit);
   bindSearchRow(P, renderPracticePage);
@@ -939,6 +990,7 @@ function renderPracticePage(){
 
 function questionHtml(q, answered, sel, P){
   let html = '';
+  html += '<button class="fav-btn' + (favSet.has(q.id) ? ' on' : '') + '" id="favBtn" title="' + (favSet.has(q.id) ? '取消收藏' : '收藏本题') + '">' + (favSet.has(q.id) ? ICONS.starF : ICONS.star) + '</button>';
   html += '<div class="q-tags">' +
     '<span class="q-tag type" style="background:' + (TYPE_COLORS[q.type]||'#15457C') + '1A;color:' + (TYPE_COLORS[q.type]||'#15457C') + '">' + typeName(q.type) + '</span>' +
     '<span class="q-tag cat">' + esc(q.cat || '未分类') + '</span>' +
@@ -1001,6 +1053,9 @@ function bindQuestionEvents(q, P, answered){
   const card = $('#qCard');
   if(!card) return;
 
+  const favBtn = $('#favBtn');
+  if(favBtn) favBtn.addEventListener('click', () => { toggleFav(q.id); renderPracticePage(); });
+
   if(q.type !== 'fill'){
     const optsBox = $('#optsBox');
     if(optsBox && !answered){
@@ -1052,6 +1107,7 @@ function toggleShuffle(){
 function rebuildQids(mode, type){
   if(mode === 'type') return bank.filter(q => q.type === type).map(q => q.id);
   if(mode === 'wrong') return Array.from(wrongSet);
+  if(mode === 'fav') return Array.from(favSet).filter(id => qById(id));
   return bank.map(q => q.id);
 }
 
@@ -1143,6 +1199,9 @@ function renderPracticeResult(){
   if(P.mode === 'wrong'){
     title = '错题训练完成';
     sub = wrongSet.size ? ('剩余错题 ' + wrongSet.size + ' 题，可继续巩固') : '错题已全部清零，太棒了';
+  } else if(P.mode === 'fav'){
+    title = '收藏练习完成';
+    sub = '本次共完成收藏题 ' + answered + ' 题，可继续巩固';
   }
 
   $('#topTitle').textContent = practiceModeLabel(P);
@@ -1409,6 +1468,7 @@ function renderBrowsePage(){
     '<div class="mode-title-row"><h2>背题模式</h2><button class="back" id="backHome2">' + ICONS.back + '返回</button></div>' +
     filterHtml +
     '<div class="qcard">' +
+      '<button class="fav-btn' + (favSet.has(q.id) ? ' on' : '') + '" id="favBtnB" title="' + (favSet.has(q.id) ? '取消收藏' : '收藏本题') + '">' + (favSet.has(q.id) ? ICONS.starF : ICONS.star) + '</button>' +
       '<div class="q-tags">' +
         '<span class="q-tag type" style="background:' + (TYPE_COLORS[q.type]||'#15457C') + '1A;color:' + (TYPE_COLORS[q.type]||'#15457C') + '">' + typeName(q.type) + '</span>' +
         '<span class="q-tag cat">' + esc(q.cat || '未分类') + '</span>' +
@@ -1427,8 +1487,12 @@ function renderBrowsePage(){
 
   $('#backHome2').addEventListener('click', () => { location.hash = isCustom ? '#search' : '#home'; });
   if(!isCustom) bindBrowseChips();
+  $('#favBtnB').addEventListener('click', () => { toggleFav(q.id); renderBrowsePage(); });
   $('#bPrev').addEventListener('click', () => { if(S.browse.idx > 0){ S.browse.idx--; renderBrowsePage(); } });
   $('#bNext').addEventListener('click', () => { if(S.browse.idx < S.browse.qids.length - 1){ S.browse.idx++; renderBrowsePage(); } });
+  attachSwipe(document.querySelector('.qcard'),
+    () => { if(S.browse.idx < S.browse.qids.length - 1){ S.browse.idx++; renderBrowsePage(); } },
+    () => { if(S.browse.idx > 0){ S.browse.idx--; renderBrowsePage(); } });
   bindSearchRow(S.browse, renderBrowsePage);
   if(S.sheetOpen) buildSheetGrid(S.browse, 'browse');
   renderSearchPopup(S.browse, renderBrowsePage);
