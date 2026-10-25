@@ -103,11 +103,24 @@ input,textarea{font-family:inherit}
 .p-stats .ps.bad{background:#FBEAEA;color:#D64545}
 .p-stats .ps.todo{background:#E7EEF7;color:var(--primary)}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);position:relative}
-.q-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding-right:44px}
+.q-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;padding-right:92px}
 .fav-btn{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:#C3CEDC;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s,color .12s}
 .fav-btn svg{width:18px;height:18px}
 .fav-btn:active{transform:scale(.92)}
 .fav-btn.on{color:#F5A623;border-color:#F5A623;background:#FDF3E0}
+.note-btn{position:absolute;top:14px;right:58px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:#6A4FA3;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:transform .12s,color .12s}
+.note-btn svg{width:17px;height:17px}
+.note-btn:active{transform:scale(.92)}
+.note-btn.on{background:#EFE9F8;border-color:#6A4FA3}
+.my-note{margin-top:10px;border-top:1px dashed rgba(0,0,0,.12);padding-top:9px;font-size:13px;color:#4A3A66;line-height:1.7}
+.my-note b{color:#6A4FA3}
+.note-mask{position:fixed;inset:0;background:rgba(9,25,49,.55);z-index:140;display:flex;align-items:center;justify-content:center;padding:20px}
+.note-panel{width:100%;max-width:440px;background:#fff;border-radius:16px;padding:18px;box-shadow:0 12px 40px rgba(9,25,49,.28)}
+.note-title{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:12px}
+.note-input{width:100%;min-height:130px;font-size:15px;line-height:1.7;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:#FBFCFE;color:var(--ink);resize:vertical;box-sizing:border-box}
+.note-input:focus{border-color:var(--primary-2);outline:none;background:#fff}
+.note-actions{display:flex;gap:10px;margin-top:14px}
+.note-actions .btn{flex:1;padding:11px 14px}
 .q-tag{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px}
 .q-tag.type{background:var(--primary-soft);color:var(--primary)}
 .q-tag.cat{background:#F0F3F7;color:var(--muted)}
@@ -448,6 +461,9 @@ button.opt:hover{border-color:var(--primary-2)}
       <p id="topSub">高铁《技规》示例题库 · 完全离线可用</p>
     </div>
     <div class="topbar-actions hidden" id="topActions">
+      <button class="icon-btn" id="btnBackPractice" title="返回首页" aria-label="返回首页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
       <button class="icon-btn" id="btnSheet" title="答题卡" aria-label="答题卡">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
       </button>
@@ -613,7 +629,7 @@ function ansText(q){
   const arr = Array.isArray(q.ans) ? q.ans : [q.ans];
   return arr.join('、') + '（' + arr.map(k => optText(q, k)).join('；') + '）';
 }
-function saveRecords(){ storeSet('rec_' + bankName, records); storeSet('wrong_' + bankName, Array.from(wrongSet)); storeSet('fav_' + bankName, Array.from(favSet)); }
+function saveRecords(){ storeSet('rec_' + bankName, records); storeSet('wrong_' + bankName, Array.from(wrongSet)); storeSet('fav_' + bankName, Array.from(favSet)); storeSet('note_' + bankName, notes); }
 function toggleFav(id){
   if(!qById(id)) return false;
   if(favSet.has(id)) favSet.delete(id); else favSet.add(id);
@@ -633,7 +649,9 @@ function saveProgress(){
     idx: P.idx, shuffled: P.shuffled,
     qids: P.qids.slice(), base: P.base.slice(),
     answered: P.answered, correct: P.correct, sel: P.sel,
-    label: P.label || null, updatedAt: Date.now()
+    label: P.label || null, optShuffled: !!P.optShuffled,
+    optMap: (P.optMap && typeof P.optMap === 'object') ? P.optMap : {},
+    updatedAt: Date.now()
   };
   storeSet('progress', all);
 }
@@ -662,7 +680,9 @@ function loadProgress(mode, type){
     sel: (p.sel && typeof p.sel === 'object') ? p.sel : {},
     finished: false,
     shuffled: !!p.shuffled,
-    label: p.label || null
+    label: p.label || null,
+    optShuffled: !!p.optShuffled,
+    optMap: (p.optMap && typeof p.optMap === 'object') ? p.optMap : {}
   };
 }
 
@@ -684,13 +704,15 @@ const ICONS = {
   link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',
   doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>',
   star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
-  starF:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>'
+  starF:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
+  note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12l-6 4H4z"/><path d="M8 9h8M8 13h5"/></svg>'
 };
 
 /* ===== 状态 ===== */
 let records = {};
 let wrongSet = new Set();
 let favSet = new Set();
+let notes = {};
 let BANKS = [];
 let bankName = '内置示例题';
 let bank = RAW_QUESTIONS;
@@ -707,6 +729,7 @@ function loadRecs(){
   records = storeGet('rec_' + bankName, {});
   wrongSet = new Set(storeGet('wrong_' + bankName, []));
   favSet = new Set(storeGet('fav_' + bankName, []));
+  notes = storeGet('note_' + bankName, {});
 }
 function refreshBank(){
   let b = bankDef(bankName);
@@ -935,7 +958,7 @@ function startPractice(mode, type, optIds, label){
     }
   }
 
-  S.practice = {mode, type, qids, base: qids.slice(), idx:0, answered:{}, correct:{}, sel:{}, finished:false, shuffled:false, label: label || null};
+  S.practice = {mode, type, qids, base: qids.slice(), idx:0, answered:{}, correct:{}, sel:{}, finished:false, shuffled:false, label: label || null, optShuffled:false, optMap:{}};
   location.hash = '#practice';
 }
 
@@ -949,7 +972,7 @@ function renderPracticePage(){
   if(P.finished){ renderPracticeResult(); return; }
 
   $('#topTitle').textContent = practiceModeLabel(P);
-  $('#topSub').textContent = '第 ' + (P.idx + 1) + ' / ' + P.qids.length + ' 题' + (P.shuffled ? ' · 乱序' : '');
+  $('#topSub').textContent = '第 ' + (P.idx + 1) + ' / ' + P.qids.length + ' 题' + (P.shuffled ? ' · 题目乱序' : '') + (P.optShuffled ? ' · 选项乱序' : '');
   $('#topActions').classList.remove('hidden');
   $('#pBottom').classList.remove('hidden');
   $('#pBottomB').classList.add('hidden');
@@ -975,6 +998,7 @@ function renderPracticePage(){
           '</span>' +
           '<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">' +
           '<button class="shuffle-btn' + (autoSubmit ? ' on' : '') + '" id="autoBtn" title="开启后：答对自动进入下一题，答错停留5秒；单选/判断点击即判，多选提交后生效">自动提交 ' + (autoSubmit ? '开' : '关') + '</button>' +
+          '<button class="shuffle-btn' + (P.optShuffled ? ' on' : '') + '" id="optShuffleBtn" title="开启后本题选项随机排列，不影响已答题目">选项乱序 ' + (P.optShuffled ? '开' : '关') + '</button>' +
           '<button class="shuffle-btn' + (P.shuffled ? ' on' : '') + '" id="shuffleBtn">' + (P.shuffled ? '乱序已开' : '切换乱序') + '</button>' +
           '</span></div>';
   body += '<div class="qcard" id="qCard">' + questionHtml(q, answered, sel, P) + '</div>';
@@ -985,6 +1009,7 @@ function renderPracticePage(){
   attachSwipe($('#qCard'), goNext, goPrev);
 
   $('#shuffleBtn').addEventListener('click', toggleShuffle);
+  $('#optShuffleBtn').addEventListener('click', toggleOptShuffle);
   $('#autoBtn').addEventListener('click', toggleAutoSubmit);
   bindSearchRow(P, renderPracticePage);
   bindQuestionEvents(q, P, answered);
@@ -1004,6 +1029,7 @@ function renderPracticePage(){
 function questionHtml(q, answered, sel, P){
   let html = '';
   html += '<button class="fav-btn' + (favSet.has(q.id) ? ' on' : '') + '" id="favBtn" title="' + (favSet.has(q.id) ? '取消收藏' : '收藏本题') + '">' + (favSet.has(q.id) ? ICONS.starF : ICONS.star) + '</button>';
+  html += (answered ? '<button class="note-btn' + (notes[q.id] ? ' on' : '') + '" id="noteBtn" title="写笔记">' + ICONS.note + '</button>' : '');
   html += '<div class="q-tags">' +
     '<span class="q-tag type" style="background:' + (TYPE_COLORS[q.type]||'#15457C') + '1A;color:' + (TYPE_COLORS[q.type]||'#15457C') + '">' + typeName(q.type) + '</span>' +
     '<span class="q-tag cat">' + esc(q.cat || '未分类') + '</span>' +
@@ -1014,7 +1040,7 @@ function questionHtml(q, answered, sel, P){
   if(q.type === 'fill'){
     html += '<input class="fill-input" id="fillInput" placeholder="请输入答案后提交" ' + (answered ? 'disabled' : '') + ' value="' + esc(sel[0] || '') + '">';
   } else {
-    const keys = (q.type === 'judge') ? ['对', '错'] : (q.opts || []).map((_, i) => 'ABCD'[i]);
+    const keys = (q.type === 'judge') ? ['对', '错'] : buildOptKeys(q, P);
     const optsHtml = keys.map((k, i) => {
       let cls = 'opt';
       const label = (q.type === 'judge') ? (k === '对' ? '正确' : '错误') : optText(q, k);
@@ -1058,8 +1084,40 @@ function feedbackHtml(q, ok, P){
   if(q.note){
     html += '<div class="note"><b>解析：</b>' + esc(q.note) + '</div>';
   }
+  if(notes[q.id]){
+    html += '<div class="my-note"><b>我的笔记：</b>' + esc(notes[q.id]) + '</div>';
+  }
   html += '</div>';
   return html;
+}
+
+function openNoteEditor(id, onSave){
+  const cur = (notes[id] || '');
+  const mask = document.createElement('div');
+  mask.className = 'note-mask';
+  mask.innerHTML =
+    '<div class="note-panel">' +
+      '<div class="note-title">我的笔记</div>' +
+      '<textarea class="note-input" id="noteInput" placeholder="记录本题要点、易错点、记忆口诀…"></textarea>' +
+      '<div class="note-actions">' +
+        '<button class="btn ghost" id="noteCancel">取消</button>' +
+        '<button class="btn primary" id="noteSave">保存</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(mask);
+  const ta = $('#noteInput');
+  ta.value = cur;
+  ta.focus();
+  $('#noteCancel').addEventListener('click', () => mask.remove());
+  mask.addEventListener('click', e => { if(e.target === mask) mask.remove(); });
+  $('#noteSave').addEventListener('click', () => {
+    const v = ta.value.trim();
+    if(v) notes[id] = v; else delete notes[id];
+    saveRecords();
+    mask.remove();
+    if(onSave) onSave();
+    toast(v ? '笔记已保存' : '已清除笔记', 'ok');
+  });
 }
 
 function bindQuestionEvents(q, P, answered){
@@ -1068,6 +1126,8 @@ function bindQuestionEvents(q, P, answered){
 
   const favBtn = $('#favBtn');
   if(favBtn) favBtn.addEventListener('click', () => { toggleFav(q.id); renderPracticePage(); });
+  const noteBtn = $('#noteBtn');
+  if(noteBtn) noteBtn.addEventListener('click', () => openNoteEditor(q.id, renderPracticePage));
 
   if(q.type !== 'fill'){
     const optsBox = $('#optsBox');
@@ -1111,10 +1171,29 @@ function toggleShuffle(){
   if(!P || P.finished) return;
   P.shuffled = !P.shuffled;
   P.qids = P.shuffled ? shuffle(P.qids) : (P.base ? P.base.slice() : rebuildQids(P.mode, P.type));
-  P.idx = 0;
-  P.answered = {}; P.correct = {}; P.sel = {};
+  P.idx = Math.min(P.idx, Math.max(0, P.qids.length - 1));
   toast(P.shuffled ? '已切换为乱序练习' : '已恢复原始顺序', 'ok');
   renderPracticePage();
+}
+function toggleOptShuffle(){
+  const P = S.practice;
+  if(!P || P.finished) return;
+  P.optShuffled = !P.optShuffled;
+  if(P.optMap){
+    Object.keys(P.optMap).forEach(id => { if(!P.answered[id]) delete P.optMap[id]; });
+  }
+  toast(P.optShuffled ? '已开启选项乱序' : '已关闭选项乱序', 'ok');
+  renderPracticePage();
+}
+function buildOptKeys(q, P){
+  const n = (q.opts || []).length;
+  const base = 'ABCD'.slice(0, n).split('');
+  if(!P) return base;
+  if(!P.optMap) P.optMap = {};
+  if(P.optMap[q.id]) return P.optMap[q.id];
+  const keys = P.optShuffled ? shuffle(base.slice()) : base;
+  P.optMap[q.id] = keys;
+  return keys;
 }
 
 function rebuildQids(mode, type){
@@ -1187,8 +1266,6 @@ function goNext(){
   const P = S.practice;
   if(!P) return;
   if(P.finished){ location.hash = '#home'; return; }
-  const q = qById(P.qids[P.idx]);
-  if(q && !P.answered[q.id]){ toast('请先提交本题答案', 'bad'); return; }
   if(P.idx < P.qids.length - 1){ P.idx++; renderPracticePage(); }
   else { P.finished = true; renderPracticePage(); }
 }
@@ -2049,6 +2126,7 @@ $('#btnNext').addEventListener('click', goNext);
 $('#btnPrev').addEventListener('click', goPrev);
 $('#btnSheetBar').addEventListener('click', openSheet);
 $('#btnSheet').addEventListener('click', openSheet);
+$('#btnBackPractice').addEventListener('click', () => { location.hash = '#home'; });
 $('#btnSheetBarB').addEventListener('click', openSheet);
 $('#btnCloseSheet').addEventListener('click', closeSheet);
 $('#mask').addEventListener('click', closeSheet);
